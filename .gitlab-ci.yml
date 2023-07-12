@@ -1,0 +1,61 @@
+## Cache composer packages between all jobs and all branches
+## of this project...
+cache:
+  key: one-key-to-rull-them-all
+  paths:
+    - composer-cache/
+
+stages:
+  - leaks
+  - test
+  - release
+
+.phptest:
+  before_script:
+    # Install all project dependencies
+    - COMPOSER_CACHE_DIR=./composer-cache composer install
+  script:
+    - vendor/bin/phpunit --coverage-text --colors=never
+    - vendor/bin/phpcs
+    - vendor/bin/phpstan analyze
+
+
+# Test with PHP7.2
+test:php72:
+  stage: test
+  extends: .phptest
+  image: cylab/php72
+
+# Test with PHP7.3
+test:php73:
+  stage: test
+  extends: .phptest
+  image: cylab/php73
+
+test:gitleaks:
+  stage: leaks
+  image:
+    name: "zricethezav/gitleaks"
+    entrypoint: [""]
+  script:
+    - gitleaks -v --repo-path=./ --config=gitleaks.toml
+
+# Runs only when we create a new tag
+release:
+  stage: release
+  only:
+    - tags
+  image: cylab/php72
+  script:
+    - echo "phar.readonly = Off" > /usr/local/etc/php/conf.d/phar-write.ini
+    - COMPOSER_CACHE_DIR=composer-cache composer install
+    - mkdir target
+    - echo $CI_COMMIT_TAG > version
+    - ./vendor/bin/box build
+    - mv monitor.phar monitor
+    - zip monitor-$CI_COMMIT_TAG.zip monitor
+    - "curl https://download.cylab.be/api/monitor-php-client/monitor-$CI_COMMIT_TAG.zip  --request POST --header \"Authorization: Bearer $UPLOAD_TOKEN\" -F \"file=@./monitor-$CI_COMMIT_TAG.zip\""
+    - php buildmanifest.php
+    - "curl https://download.cylab.be/api/monitor-php-client/manifest.json  --request POST --header \"Authorization: Bearer $UPLOAD_TOKEN\" -F \"file=@./manifest.json\""
+
+
