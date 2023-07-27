@@ -74,8 +74,8 @@ class PingCommand extends Command
             "netstat-listen-udp" => NetstatListenUDP::class,
             "cpu-temperature" => CPUtemperature::class,
             "TEMPer" => TEMPer::class,
-            "dockerstats" => TEMPer::class,
-            "apacheload" => TEMPer::class
+            "DockerStats" => DockerStats::class,
+            "ApacheLoad" => ApacheLoad::class
 
 
         ];

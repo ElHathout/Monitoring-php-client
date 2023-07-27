@@ -14,7 +14,7 @@ class DockerStats implements SensorInterface
 
     public function run()
     {
-        $process = new Process('docker stats');
+        $process = new Process('docker stats --no-stream');
         $process->run();
         return $process->getOutput();
     }
