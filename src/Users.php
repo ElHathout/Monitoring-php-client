@@ -5,16 +5,16 @@ namespace Monitor;
 use Symfony\Component\Process\Process;
 
 /**
- * Uses docker stats command to retrieve cpu usage, memory usage,... of docker containers
+ * returns content of /etc/passwd
  *
  * @author Elias El Hathout
  */
-class DockerStats implements SensorInterface
+class Users implements SensorInterface
 {
 
     public function run()
     {
-        $process = new Process('docker stats --no-stream');
+        $process = new Process('cat /etc/passwd');
         $process->run();
         return $process->getOutput();
     }

@@ -73,7 +73,11 @@ class PingCommand extends Command
             "netstat-listen-tcp" => NetstatListenTCP::class,
             "netstat-listen-udp" => NetstatListenUDP::class,
             "cpu-temperature" => CPUtemperature::class,
-            "TEMPer" => TEMPer::class
+            "TEMPer" => TEMPer::class,
+            "DockerStats" => DockerStats::class,
+            "ApacheLoad" => ApacheLoad::class
+
+
         ];
 
         // sleep between 0 and 10 seconds, to avoid hitting the server
